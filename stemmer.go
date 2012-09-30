@@ -1,3 +1,5 @@
+// Go implementation of the Paice/Husk Stemming algorithm:
+// http://www.comp.lancs.ac.uk/computing/research/stemming/Links/paice.htm
 package paicehusk
 
 import (
@@ -5,12 +7,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-// A representation of a stemming rule
-
-// A representation of a stemming rule
-
-// A representation of a stemming rule
 
 // A representation of a stemming rule
 type rule struct {
@@ -40,7 +36,7 @@ type RuleTable struct {
 func NewRuleTable(f []string) (table *RuleTable) {
 	table = &RuleTable{Table: make(map[string][]*rule)}
 	for _, s := range f {
-		if r := ValidRule(s); r != "" {
+		if r, ok := ValidRule(s); ok {
 			table.Table[r[:1]] = append(table.Table[r[:1]], ParseRule(r))
 		}
 	}
@@ -48,11 +44,14 @@ func NewRuleTable(f []string) (table *RuleTable) {
 }
 
 // Validates a rule
-func ValidRule(s string) (rule string) {
+func ValidRule(s string) (rule string, ok bool) {
 	reg := regexp.MustCompile("[a-zA-Z]*\\*?[0-9][a-zA-z]*[.>]")
-
+	ok = true
 	// Find the first instance of a rule in the provided string
 	rule = reg.FindString(s)
+	if rule == "" {
+		ok = false
+	}
 	return
 }
 
