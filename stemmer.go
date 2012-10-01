@@ -9,6 +9,8 @@ import (
 )
 
 // A representation of a stemming rule
+
+// A representation of a stemming rule
 type rule struct {
 
 	// The suffix the rule is to act on
@@ -104,6 +106,7 @@ func ParseRule(s string) (r *rule, ok bool) {
 // http://www.comp.lancs.ac.uk/computing/research/stemming/Links/paice.htm
 func Stem(word string, r *RuleTable) string {
 	stem := word
+	current := word
 
 	// Intact Flag
 	intact := true
@@ -113,45 +116,57 @@ func Stem(word string, r *RuleTable) string {
 		return stem
 	}
 
-	// Lookup the map to see if a rule is available for the
-	// given stems last letter
-	// A match was found
-	if rules, ok := r.Table[stem[len(stem)-1:]]; ok {
-		// Loop through the applicable rules
-		for _, rule := range rules {
-			// Don't bother if the length of the rule is greater than
-			// the Stem
-			if len(stem) > len(rule.suf) {
-				// Check the rule matches
-				if strings.HasSuffix(stem, Reverse(rule.suf)) {
+	// Main Control Loop
+	cont := true
+	for cont {
+		// Lookup the map to see if a rule is available for the
+		// given stems last letter
+		// A match was found
+		if rules, ok := r.Table[stem[len(stem)-1:]]; ok {
+			// Loop through the applicable rules
+			for _, rule := range rules {
+				// Don't bother if the length of the rule is greater than
+				// the Stem
+				if len(stem) > len(rule.suf) {
+					// Check the rule matches
+					if strings.HasSuffix(stem, Reverse(rule.suf)) {
 
-					// If the strip count (rule.num) is set to 0 the stem
-					// is protected and should be left alone
-					if rule.num == 0 {
-						break
-					}
+						// If the strip count (rule.num) is set to 0 the stem
+						// is protected and should be left alone
+						if rule.num == 0 {
+							break
+						}
 
-					// Apply the stem unless the intact flag is set and the
-					// stem has been operated on allready
-					if !((rule.intact == true) && (intact == false)) {
-						// Check that the result of the rule is valid, otherwise
-						// do nothing
-						if s := stem[:len(stem)-rule.num]; ValidStem(s + rule.app) {
-							stem = s + rule.app
+						// Apply the stem unless the intact flag is set and the
+						// stem has been operated on allready
+						if !((rule.intact == true) && (intact == false)) {
+							// Check that the result of the rule is valid, otherwise
+							// do nothing
+							if s := stem[:len(stem)-rule.num]; ValidStem(s + rule.app) {
+								cont = rule.cont
+								current = s + rule.app
 
-							// Set the intact flag
-							intact = false
+								// Set the intact flag
+								intact = false
 
-							// Set the continue flag based on the rule
-							if !rule.cont {
+								// Set the continue flag based on the rule
 								break
 							}
 						}
 					}
 				}
 			}
+			// No rule matched
+			if current == stem {
+				cont = false
+			} else {
+				// Set the new stem
+				stem = current
+			}
+		} else {
+			// No matching rule
+			break
 		}
-
 	}
 	return stem
 }
