@@ -44,7 +44,27 @@ func TestVowel(t *testing.T) {
 	compare(t, false, Vowel(word, 0), "Yoke")
 }
 
+func TestReverse(t *testing.T) {
+	str := "Hello"
+	expected := "olleH"
+	if r := Reverse(str); r != expected {
+		t.Errorf("Error: should be %v, got %v", expected, r)
+	}
+	str = "Here's a more complicated string to reverse."
+	expected = ".esrever ot gnirts detacilpmoc erom a s'ereH"
+	if r := Reverse(str); r != expected {
+		t.Errorf("Error: should be %v, got %v", expected, r)
+	}
+}
+
 func TestValidRule(t *testing.T) {
+	var rule1 string = "ai*2."
+	var rule2 string = "lib2l>"
+	var rule3 string = "ab*2 ."
+	var rule4 string = "fire"
+	var rule5 string = "asfa __ falkjlk ?!@|.."
+	var rule6 string = "There's a rule here somewhere: afab*4fla>"
+
 	if _, ok := ValidRule(rule1); !ok {
 		t.Errorf("Error: Ok should be %v, got %v", true, ok)
 	}
@@ -65,9 +85,12 @@ func TestValidRule(t *testing.T) {
 	}
 }
 
-var rule1 string = "ai*2."
-var rule2 string = "lib2l>"
-var rule3 string = "ab*2 ."
-var rule4 string = "fire"
-var rule5 string = "asfa __ falkjlk ?!@|.."
-var rule6 string = "There's a rule here somewhere: afab*4fla>"
+func TestParseRule(t *testing.T) {
+	var rule1 string = "ai*2."
+	var rule2 string = "lib2l>"
+
+	r := ParseRule(rule1)
+	
+
+}
+

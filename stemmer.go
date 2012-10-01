@@ -36,8 +36,8 @@ type RuleTable struct {
 func NewRuleTable(f []string) (table *RuleTable) {
 	table = &RuleTable{Table: make(map[string][]*rule)}
 	for _, s := range f {
-		if r, ok := ValidRule(s); ok {
-			table.Table[r[:1]] = append(table.Table[r[:1]], ParseRule(r))
+		if r, ok := ParseRule(s); ok {
+			table.Table[r.suf[:1]] = append(table.Table[r.suf[:1]], r)
 		}
 	}
 	return
@@ -63,8 +63,13 @@ func ValidRule(s string) (rule string, ok bool) {
 //
 // Rule nois4j> Means strip the sion suffix, append a j and check
 // for any more rules to follow
-func ParseRule(s string) *rule {
-	r := new(rule)
+func ParseRule(s string) (r *rule, ok bool) {
+	s, ok = ValidRule(s)
+	if !ok {
+		return nil, false
+	}
+
+	r = new(rule)
 	suf := regexp.MustCompile("[a-zA-Z]+")
 	intact := regexp.MustCompile("[*]")
 	num := regexp.MustCompile("[0-9]")
@@ -91,7 +96,7 @@ func ParseRule(s string) *rule {
 	} else {
 		r.cont = false
 	}
-	return r
+	return r, true
 }
 
 // Stem a string, word, based on the rules in *RuleTable r, by following
