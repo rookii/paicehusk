@@ -43,11 +43,6 @@ func readFile(path string) (lines []string, err error) {
 func main() {
 	out := bufio.NewWriter(os.Stdout)
 	defer out.Flush()
-	ruleFile, err := readFile("rules.txt")
-	if err != nil {
-		panic(err)
-	}
-	table := paicehusk.NewRuleTable(ruleFile)
 
 	testFile, err := readFile("test.txt")
 	if err != nil {
@@ -62,7 +57,7 @@ func main() {
 		words := reg.FindAllString(line, -1)
 		for _, word := range words {
 			porter := string(stemmer.Stem([]byte(word)))
-			paice := paicehusk.Stem(word, table)
+			paice := paicehusk.DefaultRules.Stem(word)
 			if porter != paice {
 				count++
 				out.WriteString(word + " ")
