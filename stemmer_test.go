@@ -13,50 +13,50 @@ func compare(t *testing.T, expected, actual interface{}, msg ...string) {
 // Mostly checking for the Y special cases
 func TestConsonant(t *testing.T) {
 	word := "THEY"
-	compare(t, true, Consonant(word, 0), "T")
-	compare(t, true, Consonant(word, 1), "H")
-	compare(t, false, Consonant(word, 2), "E")
-	compare(t, true, Consonant(word, 3), "Y")
+	compare(t, true, consonant(word, 0), "T")
+	compare(t, true, consonant(word, 1), "H")
+	compare(t, false, consonant(word, 2), "E")
+	compare(t, true, consonant(word, 3), "Y")
 	word = "Yellow"
-	compare(t, true, Consonant(word, 0), "Yoke")
+	compare(t, true, consonant(word, 0), "Yoke")
 	word = "synergy"
-	compare(t, true, Consonant(word, 0), "s")
-	compare(t, false, Consonant(word, 1), "y")
-	compare(t, true, Consonant(word, 2), "n")
-	compare(t, false, Consonant(word, 3), "e")
-	compare(t, true, Consonant(word, 4), "r")
-	compare(t, true, Consonant(word, 5), "g")
-	compare(t, false, Consonant(word, 6), "y")
+	compare(t, true, consonant(word, 0), "s")
+	compare(t, false, consonant(word, 1), "y")
+	compare(t, true, consonant(word, 2), "n")
+	compare(t, false, consonant(word, 3), "e")
+	compare(t, true, consonant(word, 4), "r")
+	compare(t, true, consonant(word, 5), "g")
+	compare(t, false, consonant(word, 6), "y")
 }
 
 // Same again
 func TestVowel(t *testing.T) {
 	word := "BUOY"
-	compare(t, false, Vowel(word, 0), "B")
-	compare(t, true, Vowel(word, 1), "U")
-	compare(t, true, Vowel(word, 2), "O")
-	compare(t, false, Vowel(word, 3), "Y")
+	compare(t, false, vowel(word, 0), "B")
+	compare(t, true, vowel(word, 1), "U")
+	compare(t, true, vowel(word, 2), "O")
+	compare(t, false, vowel(word, 3), "Y")
 	word = "synergy"
-	compare(t, false, Vowel(word, 0), "s")
-	compare(t, true, Vowel(word, 1), "y")
-	compare(t, false, Vowel(word, 2), "n")
-	compare(t, true, Vowel(word, 3), "e")
-	compare(t, false, Vowel(word, 4), "r")
-	compare(t, false, Vowel(word, 5), "g")
-	compare(t, true, Vowel(word, 6), "y")
+	compare(t, false, vowel(word, 0), "s")
+	compare(t, true, vowel(word, 1), "y")
+	compare(t, false, vowel(word, 2), "n")
+	compare(t, true, vowel(word, 3), "e")
+	compare(t, false, vowel(word, 4), "r")
+	compare(t, false, vowel(word, 5), "g")
+	compare(t, true, vowel(word, 6), "y")
 	word = "Yoke"
-	compare(t, false, Vowel(word, 0), "Yoke")
+	compare(t, false, vowel(word, 0), "Yoke")
 }
 
 func TestReverse(t *testing.T) {
 	str := "Hello"
 	expected := "olleH"
-	if r := Reverse(str); r != expected {
+	if r := reverse(str); r != expected {
 		t.Errorf("Error: should be %v, got %v", expected, r)
 	}
 	str = "Here's a more complicated string to reverse."
 	expected = ".esrever ot gnirts detacilpmoc erom a s'ereH"
-	if r := Reverse(str); r != expected {
+	if r := reverse(str); r != expected {
 		t.Errorf("Error: should be %v, got %v", expected, r)
 	}
 }
@@ -169,36 +169,36 @@ func TestNewRuleTable(t *testing.T) {
 
 func TestValidStem(t *testing.T) {
 	test := "xvzf"
-	if ok := ValidStem(test); ok {
-		t.Errorf("Error: ValidStem(%v) should be %v, got %v", test, false, ok)
+	if ok := validStem(test); ok {
+		t.Errorf("Error: validStem(%v) should be %v, got %v", test, false, ok)
 	}
 	test = "fire"
-	if ok := ValidStem(test); !ok {
-		t.Errorf("Error: ValidStem(%v) should be %v, got %v", test, true, ok)
+	if ok := validStem(test); !ok {
+		t.Errorf("Error: validStem(%v) should be %v, got %v", test, true, ok)
 	}
 	test = "aa"
-	if ok := ValidStem(test); ok {
-		t.Errorf("Error: ValidStem(%v) should be %v, got %v", test, false, ok)
+	if ok := validStem(test); ok {
+		t.Errorf("Error: validStem(%v) should be %v, got %v", test, false, ok)
 	}
 	test = "ab"
-	if ok := ValidStem(test); !ok {
-		t.Errorf("Error: ValidStem(%v) should be %v, got %v", test, true, ok)
+	if ok := validStem(test); !ok {
+		t.Errorf("Error: validStem(%v) should be %v, got %v", test, true, ok)
 	}
 	test = "a"
-	if ok := ValidStem(test); ok {
-		t.Errorf("Error: ValidStem(%v) should be %v, got %v", test, false, ok)
+	if ok := validStem(test); ok {
+		t.Errorf("Error: validStem(%v) should be %v, got %v", test, false, ok)
 	}
 	test = "ba"
-	if ok := ValidStem(test); ok {
-		t.Errorf("Error: ValidStem(%v) should be %v, got %v", test, false, ok)
+	if ok := validStem(test); ok {
+		t.Errorf("Error: validStem(%v) should be %v, got %v", test, false, ok)
 	}
 	test = "baa"
-	if ok := ValidStem(test); !ok {
-		t.Errorf("Error: ValidStem(%v) should be %v, got %v", test, true, ok)
+	if ok := validStem(test); !ok {
+		t.Errorf("Error: validStem(%v) should be %v, got %v", test, true, ok)
 	}
 	test = "bba"
-	if ok := ValidStem(test); !ok {
-		t.Errorf("Error: ValidStem(%v) should be %v, got %v", test, true, ok)
+	if ok := validStem(test); !ok {
+		t.Errorf("Error: validStem(%v) should be %v, got %v", test, true, ok)
 	}
 }
 

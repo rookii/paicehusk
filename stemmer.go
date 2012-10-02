@@ -47,9 +47,11 @@ func NewRuleTable(f []string) (table *RuleTable) {
 	return
 }
 
+// Regex for ValidRule
+var reg = regexp.MustCompile("[a-zA-Z]*\\*?[0-9][a-zA-z]*[.>]")
+
 // Validates a rule
 func ValidRule(s string) (rule string, ok bool) {
-	reg := regexp.MustCompile("[a-zA-Z]*\\*?[0-9][a-zA-z]*[.>]")
 	ok = true
 	// Find the first instance of a rule in the provided string
 	rule = reg.FindString(s)
@@ -59,7 +61,13 @@ func ValidRule(s string) (rule string, ok bool) {
 	return
 }
 
-// Parses a rule in the form:
+// Regexes for ParseRule
+var suf = regexp.MustCompile("[a-zA-Z]+")
+var intact = regexp.MustCompile("[*]")
+var num = regexp.MustCompile("[0-9]")
+var app = regexp.MustCompile("[0-9][a-zA-Z]+")
+
+// ParseRule parses a rule in the form:
 // |suffix|intact flag|number to strip|Append|Continue flag
 //
 // Eg, a rule: ht*2. Means if the stem is still intact, strip the
@@ -74,10 +82,7 @@ func ParseRule(s string) (r *rule, ok bool) {
 	}
 
 	r = new(rule)
-	suf := regexp.MustCompile("[a-zA-Z]+")
-	intact := regexp.MustCompile("[*]")
-	num := regexp.MustCompile("[0-9]")
-	app := regexp.MustCompile("[0-9][a-zA-Z]+")
+
 	r.suf = suf.FindString(s)
 	if intact.FindString(s) == "" {
 		r.intact = false
@@ -124,51 +129,52 @@ func (r *RuleTable) Stem(word string) string {
 		// Lookup the map to see if a rule is available for the
 		// given stems last letter
 		// A match was found
-		if rules, ok := r.Table[stem[len(stem)-1:]]; ok {
-			// Loop through the applicable rules
-			for _, rule := range rules {
-				// Don't bother if the length of the rule is greater than
-				// the Stem
-				if len(stem) > len(rule.suf) {
-					// Check the rule matches
-					if strings.HasSuffix(stem, Reverse(rule.suf)) {
-
-						// If the strip count (rule.num) is set to 0 the stem
-						// is protected and should be left alone
-						if rule.num == 0 {
-							break
-						}
-
-						// Apply the stem unless the intact flag is set and the
-						// stem has been operated on allready
-						if !((rule.intact == true) && (intact == false)) {
-							// Check that the result of the rule is valid, otherwise
-							// do nothing
-							if s := stem[:len(stem)-rule.num]; ValidStem(s + rule.app) {
-								cont = rule.cont
-								current = s + rule.app
-
-								// Set the intact flag
-								intact = false
-
-								// Set the continue flag based on the rule
-								break
-							}
-						}
-					}
-				}
-			}
-			// No rule matched
-			if current == stem {
-				cont = false
-			} else {
-				// Set the new stem
-				stem = current
-			}
-		} else {
+		rules, ok := r.Table[stem[len(stem)-1:]]
+		if !ok {
 			// No matching rule
 			break
 		}
+		// Loop through the applicable rules
+		for _, rule := range rules {
+			if len(stem) <= len(rule.suf) {
+				// the length of the rule is greater than
+				// the stem, so don't bother.
+				continue
+			}
+			if !strings.HasSuffix(stem, reverse(rule.suf)) {
+				// The rule does not match.
+				continue
+			}
+			if rule.num == 0 {
+				// The stem is protected and should be left alone
+				break
+			}
+
+			if rule.intact && !intact {
+				// The intact flag is set and the stem
+				// has been operated on already.
+				continue
+			}
+			s := stem[:len(stem)-rule.num]
+			if !validStem(s + rule.app) {
+				// The result of the rule is invalid, so do nothing.
+				continue
+			}
+			cont = rule.cont
+			current = s + rule.app
+
+			// Set the intact flag
+			intact = false
+
+			// Set the continue flag based on the rule
+			break
+		}
+		// No rule matched
+		if current == stem {
+			break
+		}
+		// Set the new stem
+		stem = current
 	}
 	return stem
 }
@@ -178,9 +184,9 @@ func (r *RuleTable) Stem(word string) string {
 //
 // If however, it begins with a consonant then it must contain three
 // letters and at least one of these must be a vowel or 'y'
-func ValidStem(word string) bool {
+func validStem(word string) bool {
 	// If there's no vowel left in the stem, stem is invalid
-	if !HasVowel(word) {
+	if !hasVowel(word) {
 		return false
 	}
 
@@ -190,10 +196,10 @@ func ValidStem(word string) bool {
 	}
 
 	// If the first letter is a vowel
-	if Vowel(word, 0) {
+	if vowel(word, 0) {
 		if len(word) > 1 {
 			// The Second letter must be a consonant
-			if Consonant(word, 1) {
+			if consonant(word, 1) {
 				return true
 			}
 		} else {
@@ -211,8 +217,8 @@ func ValidStem(word string) bool {
 	return false
 }
 
-// Returns true if letter at offset is a consonant
-func Consonant(word string, offset int) bool {
+// consonant returns whether the letter at offset is a consonant
+func consonant(word string, offset int) bool {
 	switch word[offset] {
 	case 'A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u':
 		return false
@@ -220,20 +226,20 @@ func Consonant(word string, offset int) bool {
 		if offset == 0 {
 			return true
 		}
-		return offset > 0 && !Consonant(word, offset-1)
+		return offset > 0 && !consonant(word, offset-1)
 	}
 	return true
 }
 
-// Returns true if letter at offset is a vowel
-func Vowel(word string, offset int) bool {
-	return !Consonant(word, offset)
+// vowel returns whether the letter at offset is a vowel
+func vowel(word string, offset int) bool {
+	return !consonant(word, offset)
 }
 
-// Returns true if the word contains a vowel
-func HasVowel(word string) bool {
+// hasVowel returns whether the word contains a vowel
+func hasVowel(word string) bool {
 	for i := 0; i < len(word); i++ {
-		if Vowel(word, i) {
+		if vowel(word, i) {
 			return true
 		}
 	}
@@ -241,7 +247,7 @@ func HasVowel(word string) bool {
 }
 
 // Reverses a string
-func Reverse(s string) string {
+func reverse(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
 		runes[i], runes[j] = runes[j], runes[i]
