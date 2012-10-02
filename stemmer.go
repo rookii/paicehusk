@@ -112,15 +112,15 @@ func ParseRule(s string) (r *rule, ok bool) {
 // the algorithm described at:
 // http://www.comp.lancs.ac.uk/computing/research/stemming/Links/paice.htm
 func (r *RuleTable) Stem(word string) string {
-	stem := word
-	current := word
+	stem := []rune(word)
+	current := []rune(word)
 
 	// Intact Flag
 	intact := true
 
 	// If the stem is less than 3 chars, nothing to do, return
 	if len(stem) < 3 {
-		return stem
+		return string(stem)
 	}
 
 	// Main Control Loop
@@ -129,7 +129,7 @@ func (r *RuleTable) Stem(word string) string {
 		// Lookup the map to see if a rule is available for the
 		// given stems last letter
 		// A match was found
-		rules, ok := r.Table[stem[len(stem)-1:]]
+		rules, ok := r.Table[string(stem[len(stem)-1:])]
 		if !ok {
 			// No matching rule
 			break
@@ -141,7 +141,7 @@ func (r *RuleTable) Stem(word string) string {
 				// the stem, so don't bother.
 				continue
 			}
-			if !strings.HasSuffix(stem, reverse(rule.suf)) {
+			if !strings.HasSuffix(string(stem), reverse(rule.suf)) {
 				// The rule does not match.
 				continue
 			}
@@ -156,12 +156,12 @@ func (r *RuleTable) Stem(word string) string {
 				continue
 			}
 			s := stem[:len(stem)-rule.num]
-			if !validStem(s + rule.app) {
+			if !validStem(string(s) + rule.app) {
 				// The result of the rule is invalid, so do nothing.
 				continue
 			}
 			cont = rule.cont
-			current = s + rule.app
+			current = []rune(string(s) + rule.app)
 
 			// Set the intact flag
 			intact = false
@@ -170,13 +170,13 @@ func (r *RuleTable) Stem(word string) string {
 			break
 		}
 		// No rule matched
-		if current == stem {
+		if string(current) == string(stem) {
 			break
 		}
 		// Set the new stem
 		stem = current
 	}
-	return stem
+	return string(stem)
 }
 
 // Acceptability condition: if the stem begins with a vowel, then it
@@ -185,21 +185,22 @@ func (r *RuleTable) Stem(word string) string {
 // If however, it begins with a consonant then it must contain three
 // letters and at least one of these must be a vowel or 'y'
 func validStem(word string) bool {
+	runes := []rune(word)
 	// If there's no vowel left in the stem, stem is invalid
-	if !hasVowel(word) {
+	if !hasVowel(runes) {
 		return false
 	}
 
 	// If the word has a vowel and is longer than 3 letters, stem is valid
-	if len(word) > 3 {
+	if len(runes) > 3 {
 		return true
 	}
 
 	// If the first letter is a vowel
-	if vowel(word, 0) {
-		if len(word) > 1 {
+	if vowel(runes, 0) {
+		if len(runes) > 1 {
 			// The Second letter must be a consonant
-			if consonant(word, 1) {
+			if consonant(runes, 1) {
 				return true
 			}
 		} else {
@@ -210,7 +211,7 @@ func validStem(word string) bool {
 		// If the first letter is a consonant
 		// The stem must contain 3 letters, one of which we allready know
 		// to be a vowel
-		if len(word) > 2 {
+		if len(runes) > 2 {
 			return true
 		}
 	}
@@ -218,7 +219,7 @@ func validStem(word string) bool {
 }
 
 // consonant returns whether the letter at offset is a consonant
-func consonant(word string, offset int) bool {
+func consonant(word []rune, offset int) bool {
 	switch word[offset] {
 	case 'A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u':
 		return false
@@ -232,12 +233,12 @@ func consonant(word string, offset int) bool {
 }
 
 // vowel returns whether the letter at offset is a vowel
-func vowel(word string, offset int) bool {
+func vowel(word []rune, offset int) bool {
 	return !consonant(word, offset)
 }
 
 // hasVowel returns whether the word contains a vowel
-func hasVowel(word string) bool {
+func hasVowel(word []rune) bool {
 	for i := 0; i < len(word); i++ {
 		if vowel(word, i) {
 			return true

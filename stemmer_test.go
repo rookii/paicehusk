@@ -12,40 +12,50 @@ func compare(t *testing.T, expected, actual interface{}, msg ...string) {
 
 // Mostly checking for the Y special cases
 func TestConsonant(t *testing.T) {
-	word := "THEY"
-	compare(t, true, consonant(word, 0), "T")
-	compare(t, true, consonant(word, 1), "H")
-	compare(t, false, consonant(word, 2), "E")
-	compare(t, true, consonant(word, 3), "Y")
-	word = "Yellow"
+	var word []rune = []rune{'T', 'H', 'E', 'Y'}
+	compare(t, true, consonant(word, 0), "T in THEY")
+	compare(t, true, consonant(word, 1), "H in THEY")
+	compare(t, false, consonant(word, 2), "E in THEY")
+	compare(t, true, consonant(word, 3), "Y in THEY")
+	word = []rune{'Y', 'O', 'K', 'E'}
 	compare(t, true, consonant(word, 0), "Yoke")
-	word = "synergy"
-	compare(t, true, consonant(word, 0), "s")
-	compare(t, false, consonant(word, 1), "y")
-	compare(t, true, consonant(word, 2), "n")
-	compare(t, false, consonant(word, 3), "e")
-	compare(t, true, consonant(word, 4), "r")
-	compare(t, true, consonant(word, 5), "g")
-	compare(t, false, consonant(word, 6), "y")
+	word = []rune{'s', 'y', 'n', 'e', 'r', 'g', 'y'}
+	compare(t, true, consonant(word, 0), "s in synergy")
+	compare(t, false, consonant(word, 1), "y in synergy")
+	compare(t, true, consonant(word, 2), "n in synergy")
+	compare(t, false, consonant(word, 3), "e in synergy")
+	compare(t, true, consonant(word, 4), "r in synergy")
+	compare(t, true, consonant(word, 5), "g in synergy")
+	compare(t, false, consonant(word, 6), "y in synergy")
+	// Unicode test (I hope?)
+	word = []rune{'男', '孩', 'b', 'o', 'y'}
+	compare(t, true, consonant(word, 2), "b in 男孩boy")
+	compare(t, false, consonant(word, 3), "o in 男孩boy")
+	compare(t, true, consonant(word, 4), "y in 男孩boy")
 }
 
 // Same again
 func TestVowel(t *testing.T) {
-	word := "BUOY"
-	compare(t, false, vowel(word, 0), "B")
-	compare(t, true, vowel(word, 1), "U")
-	compare(t, true, vowel(word, 2), "O")
-	compare(t, false, vowel(word, 3), "Y")
-	word = "synergy"
-	compare(t, false, vowel(word, 0), "s")
-	compare(t, true, vowel(word, 1), "y")
-	compare(t, false, vowel(word, 2), "n")
-	compare(t, true, vowel(word, 3), "e")
-	compare(t, false, vowel(word, 4), "r")
-	compare(t, false, vowel(word, 5), "g")
-	compare(t, true, vowel(word, 6), "y")
-	word = "Yoke"
+	var word = []rune{'B', 'U', 'O', 'Y'}
+	compare(t, false, vowel(word, 0), "B in BUOY")
+	compare(t, true, vowel(word, 1), "U in BUOY")
+	compare(t, true, vowel(word, 2), "O in BUOY")
+	compare(t, false, vowel(word, 3), "Y in BUOY")
+	word = []rune{'s', 'y', 'n', 'e', 'r', 'g', 'y'}
+	compare(t, false, vowel(word, 0), "s in synergy")
+	compare(t, true, vowel(word, 1), "y in synergy")
+	compare(t, false, vowel(word, 2), "n in synergy")
+	compare(t, true, vowel(word, 3), "e in synergy")
+	compare(t, false, vowel(word, 4), "r in synergy")
+	compare(t, false, vowel(word, 5), "g in synergy")
+	compare(t, true, vowel(word, 6), "y in synergy")
+	word = []rune{'Y', 'o', 'k', 'e'}
 	compare(t, false, vowel(word, 0), "Yoke")
+	// Unicode test
+	word = []rune{'男', '孩', 'b', 'o', 'y'}
+	compare(t, false, vowel(word, 2), "b in 男孩boy")
+	compare(t, true, vowel(word, 3), "o in 男孩boy")
+	compare(t, false, vowel(word, 4), "y in 男孩boy")
 }
 
 func TestReverse(t *testing.T) {
