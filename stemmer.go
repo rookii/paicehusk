@@ -118,7 +118,7 @@ func (r *RuleTable) Stem(word string) string {
 	// Intact Flag
 	intact := true
 
-	// If the stem is less than 3 chars, nothing to do, return
+	// If the stem is less than 3 chars, there's nothing to do, so return
 	if len(stem) < 3 {
 		return string(stem)
 	}
@@ -128,51 +128,58 @@ func (r *RuleTable) Stem(word string) string {
 	for cont {
 		// Lookup the map to see if a rule is available for the
 		// given stems last letter
-		// A match was found
 		rules, ok := r.Table[string(stem[len(stem)-1:])]
 		if !ok {
-			// No matching rule
+			// Stop the loop if a matching rule is not found 
 			break
 		}
 		// Loop through the applicable rules
 		for _, rule := range rules {
+
+			// the length of the rule is greater than
+			// the stem, so don't bother.
 			if len(stem) <= len(rule.suf) {
-				// the length of the rule is greater than
-				// the stem, so don't bother.
 				continue
 			}
+
+			// The rule does not match.
 			if !strings.HasSuffix(string(stem), reverse(rule.suf)) {
-				// The rule does not match.
 				continue
 			}
+
+			// The stem is protected and should be left alone
 			if rule.num == 0 {
-				// The stem is protected and should be left alone
 				break
 			}
 
+			// The intact flag is set and the stem
+			// has been operated on already.
 			if rule.intact && !intact {
-				// The intact flag is set and the stem
-				// has been operated on already.
 				continue
 			}
+
 			s := stem[:len(stem)-rule.num]
+			// The result of the rule is invalid, so do nothing.
 			if !validStem(string(s) + rule.app) {
-				// The result of the rule is invalid, so do nothing.
 				continue
 			}
+
+			// All criteria passed, the word should be stemmed
 			cont = rule.cont
 			current = []rune(string(s) + rule.app)
 
 			// Set the intact flag
 			intact = false
 
-			// Set the continue flag based on the rule
+			// Break and repeat the process for the new stem
 			break
 		}
+
 		// No rule matched
 		if string(current) == string(stem) {
 			break
 		}
+
 		// Set the new stem
 		stem = current
 	}
