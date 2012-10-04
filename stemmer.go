@@ -112,8 +112,8 @@ func ParseRule(s string) (r *rule, ok bool) {
 // the algorithm described at:
 // http://www.comp.lancs.ac.uk/computing/research/stemming/Links/paice.htm
 func (r *RuleTable) Stem(word string) string {
-	stem := []rune(word)
-	current := []rune(word)
+	stem := []rune(strings.ToLower(word))
+	current := stem
 
 	// Intact Flag
 	intact := true
