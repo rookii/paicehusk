@@ -29,9 +29,11 @@ type rule struct {
 	cont bool
 }
 
+// DefaultRules is a default ruleset for the english language.
 var DefaultRules = NewRuleTable(strings.Split(defaultRules, "\n"))
 
-// RuleTable stores rules based on the final letter of the suffix they act on
+// RuleTable stores rules based on the final letter of the suffix they
+// act on allowing for easy lookup.
 type RuleTable struct {
 	Table map[string][]*rule
 }
