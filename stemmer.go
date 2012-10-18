@@ -9,8 +9,6 @@ import (
 )
 
 // A representation of a stemming rule
-
-// A representation of a stemming rule
 type rule struct {
 
 	// The suffix the rule is to act on
@@ -121,7 +119,7 @@ func (r *RuleTable) Stem(word string) string {
 	intact := true
 
 	// If the stem is less than 3 chars, there's nothing to do, so return
-	if len(stem) < 3 {
+	if len(stem) <= 3 {
 		return string(stem)
 	}
 
@@ -132,7 +130,7 @@ func (r *RuleTable) Stem(word string) string {
 		// given stems last letter
 		rules, ok := r.Table[string(stem[len(stem)-1:])]
 		if !ok {
-			// Stop the loop if a matching rule is not found 
+			// Stop the loop if a matching rule is not found
 			break
 		}
 		// Loop through the applicable rules
@@ -208,10 +206,7 @@ func validStem(word string) bool {
 	// If the first letter is a vowel
 	if vowel(runes, 0) {
 		if len(runes) > 1 {
-			// The Second letter must be a consonant
-			if consonant(runes, 1) {
-				return true
-			}
+			return true
 		} else {
 			return false
 		}
@@ -358,7 +353,7 @@ tulo2v.   { -olut > -olv }
 tsis0.    { protect  -sist }
 tsi3>     { -ist > -   }
 tt1.      { -tt > -t   }
-uqi3.     { -iqu > -   } 
+uqi3.     { -iqu > -   }
 ugo1.     { -ogu > -og }
 vis3j>    { -siv > -j  }
 vie0.     { protect  -eiv }
