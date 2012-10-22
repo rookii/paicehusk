@@ -199,13 +199,13 @@ func validStem(word string) bool {
 	}
 
 	// If the word has a vowel and is longer than 3 letters, stem is valid
-	if len(runes) > 3 {
+	if len(runes) >= 3 {
 		return true
 	}
 
 	// If the first letter is a vowel
 	if vowel(runes, 0) {
-		if len(runes) > 1 {
+		if len(runes) > 1 && consonant(runes, 1) {
 			return true
 		} else {
 			return false
