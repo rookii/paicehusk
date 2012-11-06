@@ -1,5 +1,7 @@
 // Go implementation of the Paice/Husk Stemming algorithm:
 // http://www.comp.lancs.ac.uk/computing/research/stemming/Links/paice.htm
+// Copyright (c) 2012, Aaron Groves. All rights reserved.
+
 package paicehusk
 
 import (
