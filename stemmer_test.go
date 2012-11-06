@@ -132,7 +132,7 @@ var validstemtests = []struct {
 }{
 	{"xvzf", false}, // No vowels
 	{"fire", true},
-	{"aa", true}, // No consonant
+	{"aa", false}, // No consonant
 	{"ab", true},
 	{"a", false},  // No consonant
 	{"ba", false}, // A First letter consonant requires 3 letter stem
