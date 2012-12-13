@@ -2,6 +2,8 @@
 // http://www.comp.lancs.ac.uk/computing/research/stemming/Links/paice.htm
 // Copyright (c) 2012, Aaron Groves. All rights reserved.
 
+// Package paicehusk provides an implementation of the Paice / Husk stemmer,
+// along with a default ruleset for the English Language
 package paicehusk
 
 import (
